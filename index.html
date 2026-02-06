@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Master Bait</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script defer src="./app.js"></script>
+</head>
+
+<body>
+  <canvas id="bg"></canvas>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"></div>
+      <div class="brandText">
+        <div class="brandTitle">MASTER BAIT</div>
+        <div class="brandSub">Phishing Awareness Game</div>
+      </div>
+    </div>
+
+    <div class="topBtns">
+      <button class="iconBtn" id="btnSettings" title="Settings">⚙️</button>
+      <button class="iconBtn" id="btnHelp" title="Help">❓</button>
+    </div>
+  </header>
+
+  <main class="shell">
+    <!-- MENU -->
+    <section id="screenMenu" class="screen active">
+      <div class="hero card">
+        <div class="heroGlow"></div>
+        <div class="heroInner">
+          <div class="heroTitle">Don’t get baited.</div>
+          <div class="heroText">
+            Spot red flags, choose the safest action, and learn with a hologram coach.
+          </div>
+          <div class="row">
+            <button class="btn" id="btnPlay">Play Campaign</button>
+            <button class="btn ghost" id="btnMini">Mini Games</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid3">
+        <div class="card">
+          <h3>How to Win</h3>
+          <ul class="bullets">
+            <li>Inspect sender + domains</li>
+            <li>Hover links to preview URLs</li>
+            <li>Choose: Report / Ignore / Call IT</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Actions</h3>
+          <div class="chips">
+            <span class="chip">Report ✅</span>
+            <span class="chip">Ignore ✅</span>
+            <span class="chip">Call IT ✅</span>
+            <span class="chip danger">Open ❌</span>
+            <span class="chip danger">Reply ❌</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Coach</h3>
+          <p class="muted">
+            Astra gives feedback after every decision, with XP + streak to keep you playing.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAP -->
+    <section id="screenMap" class="screen">
+      <div class="mapHeader">
+        <div>
+          <h2>Level Map</h2>
+          <p class="muted">Pick a level. Earn up to 3 stars.</p>
+        </div>
+        <div class="row">
+          <button class="btn ghost" id="btnBackMenu">Back</button>
+          <button class="btn" id="btnStartSelected">Start</button>
+        </div>
+      </div>
+
+      <div class="mapWrap">
+        <div class="card">
+          <svg id="mapSvg" viewBox="0 0 1000 420" aria-label="Level map">
+            <defs>
+              <filter id="softGlow">
+                <feGaussianBlur stdDeviation="3" result="blur"/>
+                <feMerge>
+                  <feMergeNode in="blur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+              <linearGradient id="pathGrad" x1="0" x2="1">
+                <stop offset="0" stop-color="var(--accent)"/>
+                <stop offset="1" stop-color="var(--accent2)"/>
+              </linearGradient>
+            </defs>
+
+            <path id="roadBase"
+              d="M120,320 C220,220 280,360 360,260
+                 C430,180 500,320 570,240
+                 C650,165 700,255 780,205
+                 C860,160 900,245 920,170"
+              fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="44" stroke-linecap="round"/>
+
+            <path id="roadLine"
+              d="M120,320 C220,220 280,360 360,260
+                 C430,180 500,320 570,240
+                 C650,165 700,255 780,205
+                 C860,160 900,245 920,170"
+              fill="none" stroke="url(#pathGrad)" stroke-width="10" stroke-linecap="round" filter="url(#softGlow)"/>
+
+            <circle id="runner" r="10" fill="var(--accent)" filter="url(#softGlow)"></circle>
+            <g id="mapNodes"></g>
+          </svg>
+        </div>
+
+        <div class="card">
+          <h3 id="mapTitle">Level 1</h3>
+          <p id="mapDesc" class="muted">—</p>
+          <div class="stars" aria-label="Stars">
+            <span class="star" id="mStar1">★</span>
+            <span class="star" id="mStar2">★</span>
+            <span class="star" id="mStar3">★</span>
+          </div>
+          <div class="small muted">
+            Tip: Hover the sender, domain, and link chips inside messages.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LEVEL PLAY -->
+    <section id="screenLevel" class="screen">
+      <div class="levelTop">
+        <div>
+          <h2 id="levelTitle">Level</h2>
+          <div class="pillRow">
+            <span class="pill" id="pillType">Type</span>
+            <span class="pill" id="pillDiff">Difficulty</span>
+            <span class="pill" id="pillTimer">⏱ 60s</span>
+          </div>
+        </div>
+        <div class="row">
+          <label class="toggle">
+            <input type="checkbox" id="toggleHardMode">
+            <span>Hard Mode</span>
+          </label>
+          <button class="btn ghost" id="btnExitLevel">Exit</button>
+        </div>
+      </div>
+
+      <div class="arena">
+        <div class="arenaLeft">
+          <!-- EMAIL PANEL -->
+          <div class="card emailApp" id="emailApp">
+            <div class="emailTop">
+              <div class="tabs">
+                <button class="tab active">Inbox</button>
+              </div>
+              <div class="actions">
+                <button class="mini" data-action="report">Report</button>
+                <button class="mini" data-action="ignore">Ignore</button>
+                <button class="mini" data-action="callit">Call IT</button>
+                <button class="mini danger" data-action="open">Open</button>
+                <button class="mini danger" data-action="reply">Reply</button>
+              </div>
+            </div>
+
+            <div class="emailBody">
+              <aside class="emailList" id="emailList"></aside>
+
+              <article class="emailView">
+                <div class="emailHeader">
+                  <div>
+                    <div class="emailSubject" id="emailSubject">—</div>
+                    <div class="emailMeta">
+                      <span class="hoverhint" id="emailFrom" data-hint="Check sender domain carefully.">From: —</span>
+                      <span class="dot">•</span>
+                      <span class="hoverhint" id="emailReplyTo" data-hint="Reply-To can be different from From.">Reply-To: —</span>
+                      <span class="dot">•</span>
+                      <span class="hoverhint" id="emailTime" data-hint="Urgency + deadline is a common trick.">Time: —</span>
+                    </div>
+                  </div>
+
+                  <div class="trustBox">
+                    <div class="trustTitle">Official Panel</div>
+                    <div class="trustLines" id="trustLines"></div>
+                  </div>
+                </div>
+
+                <div class="emailContent" id="emailContent"></div>
+
+                <div class="emailFoot">
+                  Links:
+                  <span id="emailLinks"></span>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <!-- SMS PANEL -->
+          <div class="card phoneStage" id="phoneStage">
+            <div class="phoneTop">
+              <div class="phoneTitle">Messages</div>
+              <div class="small muted">Hover message bubbles for hints.</div>
+            </div>
+            <div class="smsScreen" id="smsScreen"></div>
+
+            <div class="phoneActions">
+              <button class="btn smallbtn" data-sms="report">Report</button>
+              <button class="btn smallbtn ghost" data-sms="ignore">Ignore</button>
+              <button class="btn smallbtn" data-sms="callit">Call IT</button>
+              <button class="btn smallbtn danger" data-sms="open">Tap Link</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="arenaRight">
+          <div class="card hud">
+            <h3>Clue Log</h3>
+            <p class="muted small">Hover hints will appear here.</p>
+            <div class="clueLog" id="clueLog"></div>
+          </div>
+
+          <div class="card hud">
+            <h3>Goal</h3>
+            <ol class="bullets">
+              <li>Inspect sender, domain, links</li>
+              <li>Choose safest action</li>
+              <li>Learn from Astra</li>
+            </ol>
+          </div>
+
+          <div class="card hud">
+            <h3>Pop-ups (Hard Mode)</h3>
+            <p class="muted small">Hard mode adds distractions + glitch.</p>
+            <div id="notifLayer" class="notifLayer"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MINI GAMES -->
+    <section id="screenMini" class="screen">
+      <div class="miniHeader">
+        <div>
+          <h2>Mini Games</h2>
+          <p class="muted">Quick practice to build real skills.</p>
+        </div>
+        <button class="btn ghost" id="btnMiniBack">Back</button>
+      </div>
+
+      <div class="grid3">
+        <div class="card">
+          <h3>Flashcard</h3>
+          <div class="flashcard" id="flashcard">
+            <div class="flashTitle" id="flashTitle">—</div>
+            <div class="flashBody" id="flashBody">—</div>
+          </div>
+          <div class="row">
+            <button class="btn ghost" id="btnFlip">Flip</button>
+            <button class="btn" id="btnNextCard">Next</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Pick the Real Domain</h3>
+          <p class="muted small">Choose the legitimate one.</p>
+          <div class="pickWrap" id="pickWrap"></div>
+          <button class="btn ghost" id="btnPickNew">New Round</button>
+        </div>
+
+        <div class="card">
+          <h3>Quick Tips</h3>
+          <ul class="bullets muted">
+            <li>Never type passwords from message links</li>
+            <li>Verify via official website you type yourself</li>
+            <li>Urgency is used to steal attention</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- SETTINGS MODAL -->
+  <div class="modal" id="settingsModal" aria-hidden="true">
+    <div class="modalCard card">
+      <div class="modalTop">
+        <h3>Settings</h3>
+        <button class="iconBtn" id="btnCloseSettings">✖</button>
+      </div>
+
+      <div class="settingRow">
+        <label class="toggle">
+          <input type="checkbox" id="toggleMusic" checked>
+          <span>Music</span>
+        </label>
+      </div>
+
+      <div class="settingRow">
+        <label class="toggle">
+          <input type="checkbox" id="toggleSfx" checked>
+          <span>SFX</span>
+        </label>
+      </div>
+
+      <div class="settingRow">
+        <span>Theme</span>
+        <select id="themeSelect">
+          <option value="purpleOrange" selected>Purple + Orange</option>
+          <option value="midnightNeon">Midnight + Neon</option>
+          <option value="oceanCitrus">Ocean + Citrus</option>
+        </select>
+      </div>
+
+      <div class="small muted">
+        Note: Sound starts after your first click (browser rule).
+      </div>
+    </div>
+  </div>
+
+  <!-- HELP MODAL -->
+  <div class="modal" id="helpModal" aria-hidden="true">
+    <div class="modalCard card">
+      <div class="modalTop">
+        <h3>Help</h3>
+        <button class="iconBtn" id="btnCloseHelp">✖</button>
+      </div>
+      <ul class="bullets">
+        <li>Hover anything glowing to log a clue.</li>
+        <li>Don’t click links in suspicious messages.</li>
+        <li>When unsure, choose <b>Call IT</b> or go to the site yourself.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ✅ HOLOGRAM COACH OVERLAY -->
+  <section class="coachDock" id="coachDock" aria-hidden="true">
+    <div class="coachCard">
+      <div class="coachLeft">
+        <div class="holoFrame" id="holoFrame">
+          <div class="holoGlow"></div>
+          <div class="scanlines"></div>
+          <div class="holoNoise"></div>
+
+          <div class="face">
+            <div class="hair"></div>
+            <div class="eyes">
+              <span class="eye"></span>
+              <span class="eye"></span>
+            </div>
+            <div class="mouth"></div>
+            <div class="cheekGlow"></div>
+          </div>
+
+          <div class="floatParticles" aria-hidden="true"></div>
+        </div>
+
+        <div class="coachNameRow">
+          <div class="coachName">Astra</div>
+          <div class="coachTag">Hologram Security Coach</div>
+        </div>
+
+        <div class="coachStats">
+          <div class="stat"><b>XP</b> <span id="xp">0</span></div>
+          <div class="stat"><b>Streak</b> <span id="streak">0</span>🔥</div>
+        </div>
+      </div>
+
+      <div class="coachRight">
+        <div class="coachTitle" id="coachTitle">Feedback</div>
+        <div class="coachBubble" id="coachBubble">…</div>
+
+        <div class="coachTip">
+          <div class="tipLabel">Quick Tip</div>
+          <div class="tipText" id="coachTip">Hover the sender + links to preview the real domain.</div>
+        </div>
+
+        <div class="coachBtns">
+          <button class="cbtn ghost" id="btnCoachClose">Close</button>
+          <button class="cbtn" id="btnCoachNext">Next</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
